@@ -1,13 +1,6 @@
 import streamlit as st 
 from dotenv import load_dotenv
-from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_openai import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationalRetrievalChain
-from langchain_community.llms import HuggingFaceHub
+from langchain_core.messages import HumanMessage, AIMessage
 from html_templates import css, bot_template, user_template
 from backend import Processing
 
@@ -15,18 +8,25 @@ def handle_user_input(question):
     response = st.session_state.conversation({'question': question})
     st.session_state.chat_history = response['chat_history']
 
-    for i, message in enumerate(st.session_state.chat_history):
-        if i % 2 == 0:
-            st.markdown(user_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
+    #for i, message in enumerate(st.session_state.chat_history):
+    #    if i % 2 == 0:
+    #        st.markdown(user_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
+    #    else:
+    #        st.markdown(bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
+    for message in st.session_state.chat_history:
+        if isinstance(message, HumanMessage):
+            with st.chat_message("Human"):
+                st.markdown(message.content)
         else:
-            st.markdown(bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
+            with st.chat_message("AI"):
+                st.markdown(message.content)
 
 def main():
     load_dotenv()
     st.set_page_config(page_title="Chat with Multiple PDFs", page_icon=":books:")
 
     st.header("Chat with multiple PDFs :books:")
-    user_question = st.text_input("Ask a question about your documents:")
+    user_question = st.chat_input("Ask a question about your documents:")
     if user_question:
         handle_user_input(user_question)
 
