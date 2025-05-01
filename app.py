@@ -2,10 +2,31 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, AIMessage
 from backend import Processing
+from stream_handler import StreamHandler
 
 def handle_user_input(question):
-    response = st.session_state.conversation({'question': question})
-    st.session_state.chat_history = response['chat_history']
+    st.session_state.chat_history.append(HumanMessage(content=question))
+    with st.chat_message("Human"):
+        st.markdown(question)
+    with st.chat_message("AI"):
+        #st.markdown(message.content)
+        stream_handler = StreamHandler(st.empty())
+        response = st.session_state.conversation.invoke(
+                {'question': question},
+                config = {"callbacks": [stream_handler]}
+        )
+    st.session_state.chat_history.append(AIMessage(content=stream_handler.final_answer))
+
+def main():
+    load_dotenv()
+    st.set_page_config(page_title="Chat with Multiple PDFs", page_icon=":books:")
+    st.header("Chat with multiple PDFs :books:")
+
+    if "conversation" not in st.session_state:
+        st.session_state.conversation = None
+
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
 
     for message in st.session_state.chat_history:
         if isinstance(message, HumanMessage):
@@ -15,18 +36,7 @@ def handle_user_input(question):
             with st.chat_message("AI"):
                 st.markdown(message.content)
 
-def main():
-    load_dotenv()
-    st.set_page_config(page_title="Chat with Multiple PDFs", page_icon=":books:")
-    st.header("Chat with multiple PDFs :books:")
     user_question = st.chat_input("Ask a question about your documents:")
-
-    if "conversation" not in st.session_state:
-        st.session_state.conversation = None
-
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = None
-
     # Answering the new question
     if user_question is not None and user_question != "":
         handle_user_input(user_question)

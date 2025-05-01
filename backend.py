@@ -56,7 +56,7 @@ class Processing():
         # Create Vector Store
         vector_store = self.get_vector_store(text_chunks)
 
-        llm = ChatOpenAI()
+        llm = ChatOpenAI(streaming=True)
 
         memory = ConversationBufferMemory(
             memory_key="chat_history",
