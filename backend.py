@@ -1,4 +1,5 @@
 from PyPDF2 import PdfReader
+import streamlit as st
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -56,7 +57,7 @@ class Processing():
         # Create Vector Store
         vector_store = self.get_vector_store(text_chunks)
 
-        llm = ChatOpenAI(streaming=True)
+        llm = ChatOpenAI(streaming=True, api_key=st.session_state.openai_key)
 
         memory = ConversationBufferMemory(
             memory_key="chat_history",
