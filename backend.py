@@ -6,7 +6,6 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.llms import HuggingFaceHub
 
 class Processing():
     def get_pdf_text(self,docs):
