@@ -5,22 +5,22 @@ from backend import Processing
 from stream_handler import StreamHandler
 
 def handle_user_input(question):
-    st.session_state.chat_history.append(HumanMessage(content=question))
     with st.chat_message("Human"):
         st.markdown(question)
     with st.chat_message("AI"):
-        #st.markdown(message.content)
         stream_handler = StreamHandler(st.empty())
         response = st.session_state.conversation.invoke(
                 {'question': question},
                 config = {"callbacks": [stream_handler]}
         )
+    st.session_state.chat_history.append(HumanMessage(content=question))
     st.session_state.chat_history.append(AIMessage(content=stream_handler.final_answer))
 
 def main():
     load_dotenv()
     st.set_page_config(page_title="Chat with Multiple PDFs", page_icon=":books:")
-    st.header("Chat with multiple PDFs :books:")
+    st.title("PDF Wizard :male_mage:")
+    st.subheader("Your solution to chat with multiple PDFs :books:")
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
