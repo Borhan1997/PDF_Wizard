@@ -17,11 +17,12 @@ def handle_user_input(question):
     st.session_state.chat_history.append(AIMessage(content=stream_handler.final_answer))
 
 def main():
-
+    
+    pdf_docs = None
     st.set_page_config(page_title="Chat with Multiple PDFs", page_icon=":books:")
     st.title("PDF Wizard :male_mage:")
     st.subheader("Your solution to chat with multiple PDFs :books:")
-
+    
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
 
@@ -35,11 +36,6 @@ def main():
         else:
             with st.chat_message("AI"):
                 st.markdown(message.content)
-
-    user_question = st.chat_input("Ask a question about your documents:")
-    # Answering the new question
-    if user_question is not None and user_question != "":
-        handle_user_input(user_question)
 
     with st.sidebar:
         st.header("API Keys")
@@ -58,6 +54,16 @@ def main():
                     
         else:
             st.warning("Please enter your OpenAI API key to proceed.")
+
+    user_question = st.chat_input("Ask a question about your documents:")
+    # Answering the new question
+    if pdf_docs:
+        if user_question is not None and user_question != "":
+            handle_user_input(user_question)
+        else:
+            st.warning("Please enter your question.")
+    else:
+        st.warning("Please upload your documents")
 
 
 
