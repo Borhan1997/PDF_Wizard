@@ -35,15 +35,15 @@ class Processing():
         chunks = text_splitter.split_text(text)
         return chunks
 
-    def get_vector_store(self,chunks):
+    def get_vector_store(self, api_key, chunks):
         """
         Create the Vector Store
         """
-        embeddings = OpenAIEmbeddings()
+        embeddings = OpenAIEmbeddings(openai_api_key=api_key)
         vector_store = FAISS.from_texts(texts=chunks, embedding=embeddings)
         return vector_store
 
-    def get_conversation_chain(self,docs):
+    def get_conversation_chain(self, api_key, docs):
         """
         Create Conversation Memory
         """
@@ -54,9 +54,9 @@ class Processing():
         text_chunks = self.get_text_chunks(raw_text)
 
         # Create Vector Store
-        vector_store = self.get_vector_store(text_chunks)
+        vector_store = self.get_vector_store(api_key, text_chunks)
 
-        llm = ChatOpenAI(streaming=True, api_key=st.session_state.openai_key)
+        llm = ChatOpenAI(openai_api_key=api_key, streaming=True)
 
         memory = ConversationBufferMemory(
             memory_key="chat_history",
